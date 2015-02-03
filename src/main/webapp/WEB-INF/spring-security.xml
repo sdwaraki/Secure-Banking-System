@@ -1,0 +1,71 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p" 
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/security
+    http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+ 
+
+<global-method-security secured-annotations="enabled" />
+ <http pattern="/Customer/DefaultEmployeeLogin.html" use-expressions="true">
+ <intercept-url pattern="/Customer/DefaultEmployeeLogin.html" access="hasAnyRole('HR_MANAGER','TRANSACTION_MANAGER','SALES_MANAGER','IT_MANAGER','ADMIN')" requires-channel="https"/>
+     <x509 subject-principal-regex="CN=.*?\s(\w+),"  user-service-ref="userService" /> 
+</http>
+	 <http auto-config="true" use-expressions="true" access-denied-page="/auth/denied">
+	
+		<intercept-url pattern="/**" requires-channel="https" />
+		<intercept-url pattern="/login.html" access="permitAll" requires-channel="https"/>
+		<intercept-url pattern="/loginfailed.html" access="permitAll" requires-channel="https"/>
+		<intercept-url pattern="/logout.html" access="permitAll" requires-channel="https"/>		 
+		<intercept-url pattern="/resources/**" access="permitAll"/>
+	  	<intercept-url pattern="/employee/CreateEmployee.html" access="hasAnyRole('HR_EMPLOYEE','HR_MANAGER')"/>
+	 	<intercept-url pattern="/customer/CreateCustomer.html" access="hasAnyRole('SALES_EMPLOYEE','SALES_MANAGER')"/>
+	 	<intercept-url pattern="/request/GetPendingRequests.html" access="hasAnyRole('ADMIN','IT_EMPLOYEE','IT_MANAGER','HR_EMPLOYEE','HR_MANAGER','TRANSACTION_EMPLOYEE','TRANSACTION_MANAGER','SALES_EMPLOYEE','SALES_MANAGER','INDIVIDUAL_CUSTOMER','MERCHANT_CUSTOMER')"/>
+		<intercept-url pattern="/request/AuthorizeRequests.html" access="hasAnyRole('ADMIN','IT_EMPLOYEE','IT_MANAGER','HR_EMPLOYEE','HR_MANAGER','TRANSACTION_EMPLOYEE','TRANSACTION_MANAGER','SALES_EMPLOYEE','SALES_MANAGER','INDIVIDUAL_CUSTOMER','MERCHANT_CUSTOMER')"/>
+		<intercept-url pattern="/MyAccount.html" access="hasAnyRole('ADMIN','IT_EMPLOYEE','IT_MANAGER','HR_EMPLOYEE','HR_MANAGER','TRANSACTION_EMPLOYEE','TRANSACTION_MANAGER','SALES_EMPLOYEE','SALES_MANAGER','INDIVIDUAL_CUSTOMER','MERCHANT_CUSTOMER')"/>
+		<intercept-url pattern="/customer/addreciepient.html" access="hasAnyRole('INDIVIDUAL_CUSTOMER','MERCHANT_CUSTOMER')"/>
+		<intercept-url pattern="/ChangePassword.html" access="hasAnyRole('ADMIN','IT_EMPLOYEE','IT_MANAGER','HR_EMPLOYEE','HR_MANAGER','TRANSACTION_EMPLOYEE','TRANSACTION_MANAGER','SALES_EMPLOYEE','SALES_MANAGER','INDIVIDUAL_CUSTOMER','MERCHANT_CUSTOMER')"/>	 	
+		<intercept-url pattern="/merchant/addpayee.html" access="hasAnyRole('MERCHANT_CUSTOMER')"></intercept-url>
+		<intercept-url pattern="/merchant/payment.html" access="hasAnyRole('MERCHANT_CUSTOMER')"></intercept-url>
+		<intercept-url pattern="/merchant/viewTransaction.html" access="hasAnyRole('MERCHANT_CUSTOMER')"></intercept-url>
+		<intercept-url pattern="/customer/DeleteCustomer.html"  access="hasAnyRole('SALES_EMPLOYEE','SALES_MANAGER')"/>
+		<intercept-url pattern="/employee/DeleteEmployee.html" access="hasAnyRole('HR_EMPLOYEE','HR_MANAGER')"/>
+		<intercept-url pattern="/request/viewMyEmployeeRequest.html"  access="hasAnyRole('HR_MANAGER','TRANSACTION_MANAGER','SALES_MANAGER','IT_MANAGER')"/>
+		<intercept-url pattern="/customer/addreciepient.html"  access="hasAnyRole('INDIVIDUAL_CUSTOMER','MERCHANT_CUSTOMER')"/>				
+		<intercept-url pattern="/customer/viewbalance.html" access="hasAnyRole('INDIVIDUAL_CUSTOMER','MERCHANT_CUSTOMER')"/>				
+		<intercept-url pattern="/transfer/fundtransfer.html" access="hasAnyRole('INDIVIDUAL_CUSTOMER','MERCHANT_CUSTOMER')"/>				
+	<form-login login-page="/login.html" default-target-url="/auth/RedirectPage.html"
+			authentication-failure-url="/loginfailed.html" />
+		<logout logout-success-url="/logout.html" />
+		<custom-filter ref="captchaCaptureFilter" before="FORM_LOGIN_FILTER"/>
+		<custom-filter ref="captchaVerifierFilter" after="FORM_LOGIN_FILTER"/>
+		<session-management invalid-session-url="/SessionTimeOut.html">
+		    <concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />
+		</session-management>
+		
+		
+	</http> 
+	
+	<beans:bean id="captchaCaptureFilter" class="bankapp.auth.CaptchaCaptureFilter" />
+	<beans:bean id="captchaVerifierFilter" class="bankapp.auth.CaptchaVerifierFilter" 
+				p:useProxy="false" 
+				p:proxyPort="" 
+				p:proxyHost=""
+				p:failureUrl="/login?error=true"
+				p:captchaCaptureFilter-ref="captchaCaptureFilter"
+				p:privateKey="6LeRJukSAAAAAMp7LQFkZIaLGCAkk2W0SQBVtZ2x"/>
+	<authentication-manager>
+        <authentication-provider>
+         <password-encoder ref="encoder"/>
+            <jdbc-user-service data-source-ref="dataSource" users-by-username-query="select username,password, enabled
+        from user where username=?" authorities-by-username-query="select ud.username, r.roleName
+        from user ud, user_role ur,role r
+        where ud.userID = ur.userID and r.roleID = ur.roleID and ud.username = ? "/>
+        </authentication-provider>    
+    </authentication-manager>
+         <beans:bean id="userService" class="bankapp.auth.MyUserDetailsService"></beans:bean>
+ 
+ 
+ </beans:beans> 

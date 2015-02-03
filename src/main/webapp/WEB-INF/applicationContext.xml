@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+<bean 
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+ 
+		<property name="location">
+			<value>/WEB-INF/database.properties</value>
+		</property>
+	</bean>
+  <bean id="dataSource" 
+      class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+      <property name="driverClassName" value="${jdbc.driverClassName}"/>
+      <property name="url" value="${jdbc.url}"/>
+      <property name="username" value="${jdbc.username}"/>
+      <property name="password" value="${jdbc.password}"/>
+   </bean>
+<bean id="JDBCTemplateClass" class="bankapp.JDBCTemplates.JDBCTemplateClass">
+      <property name="dataSource"  ref="dataSource" />
+</bean>   
+<bean id="BankUserJDBCTemplate" class="bankapp.JDBCTemplates.BankUserJDBCTemplate">
+      <property name="dataSource"  ref="dataSource" />
+</bean>
+<bean id="EmployeeJDBCTemplate" class="bankapp.JDBCTemplates.EmployeeJDBCTemplate">
+      <property name="dataSource"  ref="dataSource" />
+</bean>
+<bean id="AccountJDBCTemplate" class="bankapp.JDBCTemplates.AccountJDBCTemplate">
+      <property name="dataSource"  ref="dataSource" />
+</bean>
+<bean id="DepartmentJDBCTemplate" class="bankapp.JDBCTemplates.DepartmentJDBCTemplate">
+      <property name="dataSource"  ref="dataSource" />
+</bean>
+<bean id="RoleJDBCTemplate" class="bankapp.JDBCTemplates.RoleJDBCTemplate">
+      <property name="dataSource"  ref="dataSource" />
+</bean>
+<bean id="CustomerJDBCTemplate" class="bankapp.JDBCTemplates.CustomerJDBCTemplate">
+      <property name="dataSource"  ref="dataSource" />
+</bean>
+<bean id="SalaryJDBCTemplate" class="bankapp.JDBCTemplates.SalaryJDBCTemplate">
+      <property name="dataSource"  ref="dataSource" />
+</bean>
+<bean id="AddressJDBCTemplate" class="bankapp.JDBCTemplates.AddressJDBCTemplate">
+      <property name="dataSource"  ref="dataSource" />
+</bean>
+<bean id="AuditJDBCTemplate" class="bankapp.JDBCTemplates.AuditJDBCTemplate">
+      <property name="dataSource"  ref="dataSource" />
+</bean>
+<bean id="RecipientJDBCTemplate" class="bankapp.JDBCTemplates.RecipientJDBCTemplate">
+	<property name="dataSource" ref="dataSource" />
+</bean>
+<bean id="TransactionJDBCTemplate" class="bankapp.JDBCTemplates.TransactionJDBCTemplate">
+	<property name="dataSource" ref="dataSource"></property>
+</bean>
+<bean id="RequestJDBCTemplate" class="bankapp.JDBCTemplates.RequestJDBCTemplate">
+	<property name="dataSource" ref="dataSource"></property>
+</bean>
+<bean id="PayeeJDBCTemplate" class="bankapp.JDBCTemplates.PayeeJDBCTemplate">
+	<property name="dataSource" ref="dataSource"></property>
+</bean>
+
+
+
+<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+	<property name="host" value="smtp.gmail.com" />
+	<property name="port" value="587" />
+	<property name="username" value="thebankapplication@gmail.com" />
+	<property name="password" value="thebankapp123" />
+ 
+	<property name="javaMailProperties">
+	   <props>
+       	      <prop key="mail.smtp.auth">true</prop>
+       	      <prop key="mail.smtp.starttls.enable">true</prop>
+       	   </props>
+	</property>
+</bean>
+ 
+<bean id="mailMail" class="bankapp.Objects.MailMail">
+	<property name="mailSender" ref="mailSender" />
+</bean>
+ 
+
+   <bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+   
+</beans>

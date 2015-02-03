@@ -1,0 +1,1 @@
+<jsp:forward page="/auth/RedirectPage.html"></jsp:forward>
